@@ -1,3 +1,5 @@
+import os
+
 import multiprocessing as mp
 
 import pandas as pd
@@ -176,7 +178,8 @@ def friends_predict(model_name):
     print 'precision', precision_score(test_y, predict_y)
     print 'recall', recall_score(test_y, predict_y)
     
-    
+if not os.path.exists('result/'):
+    os.mkdir('result/')
 
 model_name = 'pets-dp-2vec'
 
