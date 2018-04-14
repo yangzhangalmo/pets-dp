@@ -110,6 +110,7 @@ def build_pairs(user_list, friends):
     
     friends_pairs = friends.loc[friends.u1<friends.u2].reset_index(drop=True)
 
+    friends_pairs = friends_pairs.loc[(friends_pairs.u1.isin(user_list))&(friends_pairs.u2.isin(user_list))].reset_index(drop=True)
     strangers_pairs = pd.DataFrame(np.random.choice(user_list, 3*friends_pairs.shape[0]),\
                                    columns=['u1'])
     strangers_pairs['u2'] = np.random.choice(user_list, 3*friends_pairs.shape[0])
@@ -139,13 +140,13 @@ def build_feature(model_name):
     Returns:
     '''
     friends = pd.read_csv('dataset/snapfacebook.csv', names=['u1', 'u2'])
-    user_list = friends.u1.unique()
     
     emb = pd.read_csv('result/'+model_name+'.emb', skiprows=1, header=None, sep=' ')
+    user_list = emb[0].unique()
 
     pairs = build_pairs(user_list, friends)
     print pairs.shape
-    
+    pairs = pairs.loc[np.random.permutation(pairs.index)].reset_index(drop=True)
     for i in range(len(pairs)):
         u1 = pairs.loc[i, 'u1']
         u2 = pairs.loc[i, 'u2']
@@ -172,7 +173,7 @@ def friends_predict(model_name):
     clf = RandomForestClassifier(n_estimators=100, n_jobs=mp.cpu_count())
     clf.fit(train_X, train_y)
     proba_y = clf.predict_proba(test_X)[:, 1]
-    predict_y = clf.predict(test_X)[:, 1]
+    predict_y = clf.predict(test_X)
 
     print 'AUC', roc_auc_score(test_y, proba_y)
     print 'precision', precision_score(test_y, predict_y)
@@ -184,7 +185,7 @@ if not os.path.exists('result/'):
 model_name = 'pets-dp-2vec'
 
 G = nx.read_edgelist('dataset/snapfacebook.csv', delimiter=',', nodetype=int)
-walk(model_name, G, walklen=80, walktimes=10)
+walk(model_name, G, walklen=10, walktimes=2)
 
 learn_emb(model_name)
 
