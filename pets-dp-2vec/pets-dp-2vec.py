@@ -49,12 +49,12 @@ def walk(model_name, G, walklen=80, walktimes=10):
 
     nodelist = G.nodes.keys()
 
-    print len(nodelist)
+    print(len(nodelist))
 
     for start_node in nodelist:
         walk_core(model_name, G, start_node, walklen, walktimes)
 
-    print 'finish walking'
+    print('finish walking')
 
 def learn_emb(model_name, walklen=80, walktimes=10, numfeatures=128):
     ''' learning word2vec vectors
@@ -66,7 +66,7 @@ def learn_emb(model_name, walklen=80, walktimes=10, numfeatures=128):
     Returns:
     '''
 
-    print 'walk_len', walklen, 'walk_times', walktimes, 'num_features', numfeatures
+    print('walk_len', walklen, 'walk_times', walktimes, 'num_features', numfeatures)
 
     min_word_count = 5
     num_workers = mp.cpu_count()
@@ -75,15 +75,15 @@ def learn_emb(model_name, walklen=80, walktimes=10, numfeatures=128):
 
     walk = pd.read_csv('result/'+model_name+'.walk',\
                        header=None, error_bad_lines=False)
-    print 'walk_shape', walk.shape
-    print walk.head(2)
+    print('walk_shape', walk.shape)
+    print(walk.head(2))
     
     walk = walk.loc[np.random.permutation(len(walk))].reset_index(drop=True)
 
     walk = walk.loc[:,:walklen-1]
     walk = walk.groupby(0).head(walktimes).reset_index(drop=True)
     walk = walk.applymap(str) # gensim only accept list of strings
-    print  walk.shape
+    print(walk.shape)
     walk = walk.values.tolist()
 
     #skip-gram
@@ -95,7 +95,7 @@ def learn_emb(model_name, walklen=80, walktimes=10, numfeatures=128):
                             window=context,\
                             sample=downsampling)
 
-    print 'training done'
+    print('training done')
     emb.wv.save_word2vec_format('result/'+model_name+'.emb')
 
 def build_pairs(user_list, friends):
@@ -145,7 +145,7 @@ def build_feature(model_name):
     user_list = emb[0].unique()
 
     pairs = build_pairs(user_list, friends)
-    print pairs.shape
+    print(pairs.shape)
     pairs = pairs.loc[np.random.permutation(pairs.index)].reset_index(drop=True)
     for i in range(len(pairs)):
         u1 = pairs.loc[i, 'u1']
@@ -175,9 +175,9 @@ def friends_predict(model_name):
     proba_y = clf.predict_proba(test_X)[:, 1]
     predict_y = clf.predict(test_X)
 
-    print 'AUC', roc_auc_score(test_y, proba_y)
-    print 'precision', precision_score(test_y, predict_y)
-    print 'recall', recall_score(test_y, predict_y)
+    print('AUC', roc_auc_score(test_y, proba_y))
+    print('precision', precision_score(test_y, predict_y))
+    print('recall', recall_score(test_y, predict_y))
     
 if not os.path.exists('result/'):
     os.mkdir('result/')
