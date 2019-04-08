@@ -111,6 +111,9 @@ def build_pairs(user_list, friends):
     friends_pairs = friends.loc[friends.u1<friends.u2].reset_index(drop=True)
 
     friends_pairs = friends_pairs.loc[(friends_pairs.u1.isin(user_list))&(friends_pairs.u2.isin(user_list))].reset_index(drop=True)
+    
+    friends_pairs = friends_pairs.sample(1000).reset_index(drop=True)
+    
     strangers_pairs = pd.DataFrame(np.random.choice(user_list, 3*friends_pairs.shape[0]),\
                                    columns=['u1'])
     strangers_pairs['u2'] = np.random.choice(user_list, 3*friends_pairs.shape[0])
@@ -148,6 +151,8 @@ def build_feature(model_name):
     print(pairs.shape)
     pairs = pairs.loc[np.random.permutation(pairs.index)].reset_index(drop=True)
     for i in range(len(pairs)):
+        if i % 1000 == 0:
+            print i
         u1 = pairs.loc[i, 'u1']
         u2 = pairs.loc[i, 'u2']
         label = pairs.loc[i, 'label']
