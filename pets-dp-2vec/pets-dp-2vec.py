@@ -152,7 +152,7 @@ def build_feature(model_name):
     pairs = pairs.loc[np.random.permutation(pairs.index)].reset_index(drop=True)
     for i in range(len(pairs)):
         if i % 1000 == 0:
-            print i
+            print(i)
         u1 = pairs.loc[i, 'u1']
         u2 = pairs.loc[i, 'u2']
         label = pairs.loc[i, 'label']
